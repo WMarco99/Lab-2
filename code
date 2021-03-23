@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet Exercise</title>
+	<meta charset="utf-8" />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />	
+	<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+  
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>	
+	
+</head>
+<body>
+  
+  <h2>Stop Searcher</h2>
+
+  <div id="mapid" style="width: 600px; height: 400px;"></div>
+
+  <div id="controls" style="margin: 15px;">
+    <button id="showAllStopButton">Show All Stops</button>
+    
+    <span style="display:inline-block; width: 30px"></span>
+    <input type="text" id="highlightStopTextEntry" 
+           placeholder="Stop name">
+    <button id="highlightStopButton">Search</button>
+      
+  <script>
+    
+    
+    var map = L.map('mapid', { 
+      	center: [49.24460889559456, -123.12280503470423],
+      	zoom: 12
+    	} 
+      );
+    
+		var topoTiles = L.tileLayer(     								'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+		maxZoom: 17,
+		attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
+		}
+	).addTo(map);
+    
+    var stopMarkerOptions = {
+      radius: 2,
+      fillColor: "#8f8f8f",
+      color: "#000",
+      weight: 1,
+      opacity: 0.5,
+      fillOpacity: 0.5
+    };
+    
+    var stopMarkerHighlightedOptions = {
+    	radius: 3,
+    	fillColor: "#3c8ccc",
+    	color: "#000",
+    	weight: 1,
+    	opacity: 0.5,
+    	fillOpacity: 0.5
+		};
+    
+    function onEachStop(feature, layer) {
+       if (feature.properties && feature.properties.name) {
+          layer.bindTooltip(feature.properties.name);
+       }
+    }
+    
+    function StopPointToLayer(feature, latlng) {
+      
+      if (nameToHighlight === "") {
+        stopMarkerOptionsToUse = stopMarkerOptions;
+      } else {
+        stopMarkerOptionsToUse = stopMarkerHighlightedOptions;
+      }
+      
+      return L.circleMarker(
+        latlng,
+        stopMarkerOptionsToUse
+      );
+    }
+    
+    function stopToFilter(feature, layer) {
+      if (nameToHighlight === "") {
+        return true;
+      } else if (feature.properties && feature.properties.name) {
+        return feature.properties.name.toLowerCase().includes(nameToHighlight.toLowerCase());
+      } else {
+        return false;
+      }
+    };
+    
+    var lastLayerAdded = {};
+
+    function addStop() {
+      if (map.hasLayer(lastLayerAdded)) {
+        map.removeLayer(lastLayerAdded);
+      }
+      lastLayerAdded = L.geoJSON(StopGeoJSONdata, {
+        pointToLayer: StopPointToLayer,
+        onEachFeature: onEachStop,
+        filter: stopToFilter
+      });
+      lastLayerAdded.addTo(map);
+    };
+    
+    var nameToHighlight = "";
+  
+    function highlightStop() {
+      nameToHighlight = document
+        .getElementById("highlightStopTextEntry")
+        .value;
+      addStop();
+      nameToHighlight = "";
+      
+    }
+    
+    var StopGeoJSONdata;
+    
+    $.getJSON("https://raw.githubusercontent.com/carsonyl/translink-derived-datasets/master/datasets/stops.geojson",
+   function(data){
+		StopGeoJSONdata = data;
+      
+		document
+          .getElementById("showAllStopButton")
+          .addEventListener("click", addStop);
+      
+        document
+          .getElementById("highlightStopButton")
+          .addEventListener("click",highlightStop);
+      
+    	}
+    );
+  
+  </script>
+
+</body>
+</html>
