@@ -3,7 +3,7 @@
 Working URL: https://editor.p5js.org/wmarco7/present/2FdZ-M1Bc 
 
 Screenshot: 
-![Screenshot]
+![Screenshot](https://github.com/WMarco99/Lab-2/blob/main/Lab%202%20Screenshot.png)
 
 For this map, I created a transit stop map where all bus stops and train stations could be searched up by train. This map is intended for general public for navigation. I used previous labs to as a reference for the lab. In terms of data, I sourced the stop data from Github (link: https://github.com/carsonyl/translink-derived-datasets). The markers are chosen to be grey to fit the map as there is an overwhelming amount of stops that would be too harsh on the eyes. When highlighted, the stop will turn blue for easy navigation. In terms of interactivity, labels will appear over the stop to provide information for the user.
 
